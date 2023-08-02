@@ -1,0 +1,91 @@
+This Java program represents a basic client-server application. The `Client` class establishes a connection with a server running on the localhost at port 8989. The client sends messages to the server and receives responses.
+
+Let's break down the code step by step:
+
+1. Importing necessary classes:
+```java
+import java.io.*;
+import java.net.*;
+```
+
+2. Defining the `Client` class:
+```java
+public class Client implements Runnable {
+```
+
+3. Declaring static variables for the client:
+```java
+static Socket clientSocket = null;
+static PrintStream os = null;
+static DataInputStream is = null;
+static BufferedReader br = null;
+static boolean closed = false;
+```
+
+4. The `main` method starts the client application:
+```java
+public static void main(String args[]) {
+```
+
+5. Setting up the client's connection with the server:
+```java
+int PORT = 8989;
+String HOST = "localhost";
+
+// Attempt to create a socket connection to the server
+try {
+    clientSocket = new Socket(HOST, PORT);
+    // Set up streams for communication
+    br = new BufferedReader(new InputStreamReader(System.in));
+    os = new PrintStream(clientSocket.getOutputStream());
+    is = new DataInputStream(clientSocket.getInputStream());
+}
+```
+
+6. The client reads input from the user and sends messages to the server:
+```java
+try {
+    // Start a new thread to receive responses from the server
+    new Thread(new Client()).start();
+
+    while (!closed) {
+        // Read input from the user
+        str = br.readLine();
+
+        // Process the input and send messages to the server
+        if (str.contains("/")) {
+            if (str.contains("/0"))
+                os.println("ABORT");
+            else
+                os.println("COMMIT");
+        } else
+            os.println(str);
+    }
+
+    // Close streams and socket after use
+    os.close();
+    is.close();
+    clientSocket.close();
+}
+```
+
+7. The `run` method runs in a separate thread to receive responses from the server:
+```java
+@Override
+public void run() {
+    String response;
+    try {
+        // Loop to read responses from the server until it receives "GLOBAL_COMMIT" or "GLOBAL_ABORT"
+        while ((response = is.readLine()) != null) {
+            System.out.println("\n" + response);
+            if (response.equalsIgnoreCase("GLOBAL_COMMIT") || response.equalsIgnoreCase("GLOBAL_ABORT"))
+                break;
+        }
+        closed = true;
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+```
+
+In summary, the `Client` class connects to a server, allows the user to input messages, sends those messages to the server, and receives responses from the server, which are then displayed on the client's console. The server's responses can trigger the client to close its connection and terminate the application.

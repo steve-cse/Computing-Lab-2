@@ -1,0 +1,35 @@
+This Java class `ClientThread` is part of a two-phase commit (2PC) protocol implementation for a server application. The 2PC protocol ensures that all participating clients in a distributed system either commit or abort a transaction collectively.
+
+Let's go through the code and understand its functionality:
+
+1. Class `ClientThread` extends the `Thread` class, indicating that each client connection will be handled in a separate thread.
+
+2. The class contains several instance variables to manage the client's state and communication with the server and other clients.
+
+3. Constructor `ClientThread(Server server, Socket clientSocket)` receives the `Server` instance and the client's `Socket` object when the thread is created.
+
+4. The `run` method represents the code that will be executed when the thread starts running.
+
+5. Inside the `run` method:
+
+   a. It sets up input and output streams to communicate with the connected client.
+   
+   b. It asks the client to enter its name and sends a welcome message.
+   
+   c. It sends a vote request to the client, asking it to vote for "A" or "B".
+   
+   d. It continuously listens for messages from the client (votes), and when it receives "ABORT" or "COMMIT":
+
+      - If the client votes "ABORT":
+        - It informs all other connected clients about the global abort by sending "GLOBAL_ABORT" messages to them.
+        - It closes the input and output streams of all clients and terminates the application by calling `System.exit(0)`.
+
+      - If the client votes "COMMIT":
+        - It updates the server's data list to record the client's vote as "COMMIT".
+        - It checks if all clients have voted (server's `data` list does not contain "NOT_SENT" values for any client).
+        - If all clients have voted "COMMIT", it informs all connected clients about the global commit by sending "GLOBAL_COMMIT" messages to them.
+        - It closes the input and output streams of all clients and terminates the application by calling `System.exit(0)`.
+
+   e. After the decision is made (global commit or abort), it sets the server's `closed` variable to `true` and closes the client's socket connection.
+
+Note: It's important to mention that this code snippet is only a part of the complete server-side implementation of the 2PC protocol. To fully understand the protocol and its implementation, you would need to examine the rest of the server code, especially how it handles incoming client connections, manages the list of clients, and coordinates the commit or abort process.

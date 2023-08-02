@@ -1,0 +1,29 @@
+This Java program represents a basic server application for a two-phase commit (2PC) protocol implementation. The server listens for incoming client connections on port 8989 and coordinates the commit or abort decision among all connected clients.
+
+Let's go through the code and understand its functionality:
+
+1. The `Server` class contains several instance variables to manage the server's state and the list of connected clients.
+
+2. The constructor `Server()` initializes two lists: `t` (for `ClientThread`) to hold the threads handling client connections and `data` to store the votes of each client.
+
+3. The `main` method starts the server application:
+
+   a. It creates a server socket to listen for incoming client connections on port 8989.
+
+   b. It initializes a `Server` instance to manage the server's state and client connections.
+
+   c. The server enters a loop that listens for client connections until it is closed.
+
+   d. When a client connects, the server accepts the connection, creates a new `ClientThread` object to handle the client, and adds it to the `t` list of client threads.
+
+   e. The server also adds a "NOT_SENT" entry to the `data` list to represent the vote of the newly connected client (not voted yet).
+
+   f. The `ClientThread` is started, and it handles the communication with the connected client independently in a separate thread.
+
+4. The `ClientThread` class (not shown in this snippet) will be responsible for handling client communication and processing their votes.
+
+5. The server keeps listening for incoming client connections until `server.closed` becomes `true`.
+
+6. After the server loop ends (when `server.closed` becomes `true`), the server socket is closed, and the server application terminates.
+
+The complete implementation of the `ClientThread` class would contain the logic to communicate with each client, receive their votes, update the `data` list with the client votes, and manage the global commit or abort decision based on the votes received from all clients. The communication logic inside `ClientThread` will determine the overall behavior of the two-phase commit protocol for this server application.
